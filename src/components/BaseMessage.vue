@@ -11,11 +11,8 @@
 export default {
  props : ['title','description'],
  methods: {
-     destroy(e) {
-         let elementToDestroy = e.path[1];
-         console.log(elementToDestroy); 
-         this.$emit("destroy",this.title);
-         elementToDestroy.style.display = "none";
+     destroy() {
+       console.log(this.$key);
         
     }
  }   

@@ -1,6 +1,6 @@
 <template>
     <div>
-     <base-message v-for='done in doneList' :key="done.title" :title="done.title" :description="done.description"></base-message>
+     <base-message v-for='progress in progressList' :key="progress.title" :title="progress.title" :description="progress.description"></base-message>
     </div>
 </template>
 
@@ -9,17 +9,10 @@
 import BaseMessage from './BaseMessage.vue'
 export default {
   props : [
-      'doneList'
+      'inprogressList'
   ],
   components: { BaseMessage },
-  data() {
-      return {
-    
-        title: "Build the Kanban Board",
-        description: "That would be a huge step forward..."
-                
-      }
-  }
+
     
 }
 </script>

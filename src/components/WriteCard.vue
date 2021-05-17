@@ -12,7 +12,7 @@
             <div class="form-control" id="radiobuttons">
 
                 <input type="radio" id="todo" name="column" value="todo" class="radio"> 
-                <label for="todo" class="radio">ToDo</label >
+                <label for="todo" class="radio" checked>ToDo</label >
                 
                 <input type="radio" id="inprogress" name="column" value="inprogress" class="radio">
                 <label for="in progress" class="radio"> Progress </label>
@@ -29,15 +29,34 @@
 
 
 <script>
+import { kanban } from "../agent"
 
 export default {
+    
     inject:['addMessage'],
     methods: {
         submitMessage() {
-            const enteredName = this.$refs.nameInput.value;
-            const enteredContent = this.$refs.contentInput.value;
+            const enteredName = this.$refs.titleInput.value;
+            const enteredContent = this.$refs.descriptionInput.value;
+            const enteredColumn = document.querySelector('input[name=column]:checked').value;
+            console.log(enteredColumn);
+            const sendData = async (number) => {
+                await kanban.addCard(enteredName, enteredContent, number);
+            }
+            if (enteredColumn == "todo") {
+                sendData(0); //Column todo has id 0 in our canister
+            }
+            else if (enteredColumn =="inprogress") {
+                sendData(1); //Column todo has id 0 in our canister
+            }
+            else if (enteredColumn =="done") {
+                sendData(2); //Column todo has id 0 in our canister
+            }
+            else {
+                return; 
+            }
             
-            this.addMessage(enteredName,enteredContent);
+            return;
         }
     }
 }
@@ -61,13 +80,13 @@ export default {
     padding: 1rem;
     margin: 2rem auto;
     max-width: 40rem;
-    background-color: #3a0061;
 }
 
 label {
   font-weight: bold;
   display: block;
   margin-bottom: 0.5rem;
+  margin: 0 auto;
 }
 
 input,

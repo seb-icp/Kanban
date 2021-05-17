@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "RawMap": {
+      "main": "test/RawMap.mo"
+    },
+    "NatIntMap": {
+      "main": "test/NatIntMap.mo"
+    },
+    "ColorPalette": {
+      "main": "test/ColorPalette.mo"
+    },
+    "GameEntities": {
+      "main": "test/GameEntities.mo"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "vessel sources",
+      "output": "canisters/"
+    },
+    "start": {
+      "address": "127.0.0.1",
+      "port": 8000
+    }
+  }
+}

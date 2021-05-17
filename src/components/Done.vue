@@ -13,12 +13,7 @@ export default {
   ],
   components: { BaseMessage },
   data() {
-      return {
     
-        title: "Build the Kanban Board",
-        description: "That would be a huge step forward..."
-                
-      }
   }
     
 }

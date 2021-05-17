@@ -12,7 +12,7 @@ export default {
         changeTab(number) {
             this.$emit("change-tab", number);
         },
-    
+        
 }}
 </script>
 
@@ -22,7 +22,7 @@ export default {
 
 .container {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
 }
 
 button {

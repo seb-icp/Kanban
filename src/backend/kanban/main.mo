@@ -1,101 +1,76 @@
 import Array "mo:base/Array";
+import Hash "mo:base/Hash";
+import Nat "mo:base/Nat";
+import Nat32 "mo:base/Nat32";
+import DB "mo:crud/Database";
 
-actor kanban{
-    stable var currentValue: Nat = 0;
+import Types "./Types";
 
-    public func increment(): async () {
-        currentValue += 1;
+actor {
+
+    type Id = Types.Id;
+    type Card = Types.Card;
+    type Column = Types.Column;
+
+    func mirror (n : Nat32) : Nat32 {   //needed to get a function of type Nat32 -> Hash (Type Hash is type Nat32)
+        return (n);
     };
 
-    public query func getValue(): async Nat {
-        currentValue;
+    let dbCards = DB.Database<Id, Card>(Types.getNextId, Nat32.equal, #hash mirror); //The hash is the Nat32 itself
+    let dbColumns = DB.Database<Id, Column>(Types.getNextId, Nat32.equal, #hash mirror);
+    var lastId : Id = 0; 
+
+    public func addColumn(title: Text) : async Nat32 {
+        dbColumns.create({ title; })
     };
 
-    // A board contains a collection of columns
-    // Column ordering is maintained implicitly by array index
-    type Board = {
-        columns: [Column];
+    public func readColumn(columnId: Nat32) : async DB.Res<Column> {
+        dbColumns.read(columnId)
     };
 
-    // A column contains a collection of cards and a variant describing the colum
-    type Column = {
-        column_type: ColumnType;
-        cards: [Card];
+    public func updateColumn(columnId: Nat32, column: Column) : async DB.Res<()> {
+        dbColumns.update(columnId, column)
     };
 
-    // Column Type: To Do, In Progress, Done
-    type ColumnType = Text;
-
-    // A card contains a title and description of the work to be done
-    type Card = {
-        title: Text;
-        description: Text;
+    func deleteColumn(id: Id) : DB.Res<()> {
+        dbCards.delete(id)
     };
 
-    // This should persist across updates in production
-    stable var board : Board = { columns = []};
-
-    public query func getBoard() : async Board {
-        board
-    };
-
-
-
-    public func createBoard() {
-        let todo = "Todo";
-        let inprogress = "In Progress";
-        let done = "Done";
-        board := {
-            columns = [
-                createColumn(todo),
-                createColumn(inprogress),
-                createColumn(done)
-            ]
-        };
-    };
-
-    // public func addColumnToBoard(name: Text) {
-    //     let oldColumns = board.columns;
-    //     let newColumns = Array.append<Column>(oldColumns, [createColumn(name)]);
-    //     board := { columns = newColumns };
-    // };
-
-    public func addCardToColumn(columnName: ColumnType, cardName: Text, cardDescription: Text) {
+    public func addCard(title: Text, description: Text, columnId: Nat32) : async DB.Res<Id> {
+        lastId +=1;
+        // Ensure column already exists
+        switch (dbColumns.read(columnId)) {
+            case (#ok(_)) #ok(dbCards.create({ title; description; columnId }));
+            case (#err(e)) #err(e);
+        }
         
     };
 
-
-
-    func createColumn(name: Text) : Column {
-        { column_type = name; cards = []; }
+    public func readCard(cardId: Id) : async DB.Res<Card> {
+        dbCards.read(cardId)
     };
 
-    func deleteCard(column: Column, titleToDelete: Text) : Column {
-        let oldCards = column.cards;
-
-        let filterFn = func (c: Card) : Bool { c.title != titleToDelete };
-        let newCards = Array.filter<Card>(
-            oldCards,
-            filterFn
-        );
-
-        {
-            column_type = column.column_type;
-            cards = newCards;
-        }
+    public func updateCard(cardId: Id, card: Card) : async DB.Res<()> {
+        dbCards.update(cardId, card)
     };
 
-    func deleteColumn(columnTypeToDelete: ColumnType) : Board {
-        let oldColumns = board.columns;
-
-        let filterFn = func (c: Column) : Bool { c.column_type != columnTypeToDelete };
-        let newColumns = Array.filter<Column>(
-            oldColumns,
-            filterFn
-        );
-
-        {
-            columns = newColumns;
-        }
+    func deleteCard(id: Id) : DB.Res<()> {
+        dbCards.delete(id)
     };
+
+
+    public query func howManyCards() : async Nat32 {
+        (lastId);
+    };
+
+
+
+    public func test () : async () {
+        ignore (addColumn("Todo"));
+        ignore (addCard("Seb", "Hello World", 0));
+        return ();
+    }
+    
+
+
 };
