@@ -11,8 +11,10 @@
 export default {
  props : ['title','description'],
  methods: {
-     destroy() {
-       console.log(this.$key);
+     destroy(e) {
+       let card = e.path[1];
+       card.style.display = "none";  //Hide the card 
+       this.$emit('delete-card');   // Delete the card from canister database and user lists. 
         
     }
  }   

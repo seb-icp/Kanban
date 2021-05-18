@@ -1,6 +1,6 @@
 <template>
     <div>
-     <base-message v-for='done in doneList' :key="done.title" :title="done.title" :description="done.description"></base-message>
+     <base-message v-for='done in doneList' :key="done.title" :title="done.title" :description="done.description" @delete-card="deleteCard(done.title)"></base-message>
     </div>
 </template>
 
@@ -12,8 +12,11 @@ export default {
       'doneList'
   ],
   components: { BaseMessage },
-  data() {
-    
+  methods: {
+    deleteCard(title) {
+      console.log(title);
+      this.$emit('delete-card', title);
+    }
   }
     
 }

@@ -1,6 +1,6 @@
 <template>
     <div>
-     <base-message v-for='progress in progressList' :key="progress.title" :title="progress.title" :description="progress.description"></base-message>
+     <base-message v-for='progress in inprogressList' :key="progress.title" :title="progress.title" :description="progress.description" @delete-card="deleteCard(progress.title)"></base-message>
     </div>
 </template>
 
@@ -12,7 +12,12 @@ export default {
       'inprogressList'
   ],
   components: { BaseMessage },
-
+  methods: {
+    deleteCard(title) {
+      console.log(title);
+      this.$emit('delete-card', title);
+    }
+  }
     
 }
 </script>

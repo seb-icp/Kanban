@@ -6,12 +6,12 @@
         <h2 class="todo"> To Do 💡 </h2>
         <h2 class="progress"> In Progress 👩‍💻 </h2>
         <h2 class="done" @click="updateBoard"> Done ✅  </h2>
-        <to-do class="todo-content" :todoList="todoList"></to-do>
-        <in-progress class="inprogress-content" :inProgressList="inProgressList" ></in-progress>
-        <done class="done-content" :doneList="doneList" ></done>
+        <to-do class="todo-content" :todoList="todoList" @delete-card="deleteCard1"></to-do>
+        <in-progress class="inprogress-content" :inprogressList="inProgressList" @delete-card="deleteCard2" ></in-progress>
+        <done class="done-content" :doneList="doneList" @delete-card="deleteCard3"></done>
   </div>
   <about-us  v-if="selectedTab ==1"></about-us>
-  <write-card v-if="selectedTab==2" ></write-card>
+  <write-card v-if="selectedTab==2" @add-message="addMessage"></write-card>
 </template>
 
 <script>
@@ -26,7 +26,7 @@ import ToDo from "./components/ToDo.vue";
 import BaseMessage from "./components/BaseMessage.vue";
 
 import { kanban } from "./agent"
-import { ref, onMounted } from "vue"
+import { ref } from "vue"
 
 export default defineComponent({
   name: 'App',
@@ -42,13 +42,20 @@ export default defineComponent({
   },
   data() {
   return {
-    selectedTab: 1
+    selectedTab: 1,
+    cardList : [],
+    todoList : [],
+    inProgressList : [],
+    doneList : [],
   } 
+  },
+  created() {
+    this.updateBoard();
   },
   methods: {
     changeTab(value) {
       this.selectedTab = value;
-      this.updateBoard();
+      // this.updateBoard(); //Pire méthode du monde 
     },
     updateBoard() {
             console.log("Start...")
@@ -57,7 +64,7 @@ export default defineComponent({
 
             const howManyCards = async () => {
             numberCard.value = await kanban.howManyCards();
-            return( numberCard.value);
+            return (numberCard.value)
             }
 
             const refreshBoard = async () => {
@@ -71,38 +78,94 @@ export default defineComponent({
                 for (let i=0 ; i< x ; i++)  {
                     let card = await kanban.readCard(i); //Not optimized at all
                     cardList.push(card);
-                    console.log("Do we go here?")
-                    console.log(cardList);
                 }
 
                 for (let i=0 ; i< x ; i++) {
-                    let column = cardList[i].ok.columnId; // .ok because the result was of type Result 
-                    console.log(column);
-                    if (column == 0 ) {
-                        todoList.push(cardList[i].ok);
+                    try {         //We need a try catch because some card can be deleted and of type #err
+                       let column = cardList[i].ok.columnId; 
+                          if (column == 0 ) {
+                          todoList.push(cardList[i].ok);
+                        }
+                          else if (column == 1 ) {
+                          inProgressList.push(cardList[i].ok);
+                        }
+                          else if (column == 2) {
+                          doneList.push(cardList[i].ok);
+                        }
                     }
-                    else if (column == 1 ) {
-                        inProgressList.push(cardList[i].ok);
-                    }
-                    else {
-                        doneList.push(cardList[i].ok);
+                    catch {
+                      console.log("C'est une carte supprimée")
                     }
                     
                 }
 
-                this.cardList = cardList;
-                this.todoList = todoList;
+                this.cardList = cardList; //cardList contains ALL cards deleted or not to keep track of the index 
+                this.todoList = todoList; //Other list contains only cards not deleted 
                 this.inProgressList = inProgressList;
                 this.doneList = doneList;
-            
-
+                console.log(this.todoList);
                 console.log(this.cardList);
+            
                 return;
             }
 
         refreshBoard();
 
     },
+    deleteCard(titleCard) {
+      let index; 
+      for (let i=0 ; i<this.cardList.length ; i++) {
+        try {
+            if (this.cardList[i].ok.title == titleCard ) {
+            index =i;
+            }
+        }
+        catch { 
+            
+        }
+      }
+
+        kanban.deleteCard(index);
+
+    },
+    deleteCard1(titleCard) {
+     
+      this.todoList = this.todoList.filter ( todo => todo.title != titleCard);
+      this.deleteCard(titleCard);
+    },
+    deleteCard2(titleCard) {
+      
+      this.inProgressList = this.inProgressList.filter ( inprogress => inprogress.title != titleCard);
+      this.deleteCard(titleCard);
+    },
+    deleteCard3(titleCard) {
+      
+      this.doneList = this.doneList.filter ( done => done.title != titleCard);
+      this.deleteCard(titleCard);
+    },
+    addMessage(enteredName , enteredContent , enteredColumn) {
+      
+       if (enteredColumn == "todo") {
+               
+                this.todoList.push({title : enteredName, description : enteredContent , columnId : 0});
+                this.cardList.push({ok:{title:enteredName , description : enteredContent , columnId : 0}})
+          }
+      else if (enteredColumn =="inprogress") {
+                
+                this.inProgressList.push({title : enteredName, description : enteredContent , columnId : 1});
+                this.cardList.push({ok:{title:enteredName , description : enteredContent , columnId : 1}})
+          }
+      
+      else if (enteredColumn =="done") {
+              
+               this.doneList.push({title : enteredName, description : enteredContent , columnId : 2});
+               this.cardList.push({ok:{title:enteredName , description : enteredContent , columnId : 2}})
+          }
+      else {
+                return; 
+      } 
+    }
+
   }})
 </script>
 

@@ -40,6 +40,7 @@ export default {
             const enteredContent = this.$refs.descriptionInput.value;
             const enteredColumn = document.querySelector('input[name=column]:checked').value;
             console.log(enteredColumn);
+            this.$emit('add-message', enteredName , enteredContent , enteredColumn);
             const sendData = async (number) => {
                 await kanban.addCard(enteredName, enteredContent, number);
             }

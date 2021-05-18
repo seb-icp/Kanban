@@ -1,6 +1,6 @@
 <template>
     <div>
-     <base-message v-for='todo in todoList' :key="todo.title" :title="todo.title" :description="todo.description"></base-message>
+     <base-message v-for='todo in todoList' :key="todo.title" :title="todo.title" :description="todo.description" @delete-card="deleteCard(todo.title)"></base-message>
     </div>
 </template>
 
@@ -12,13 +12,11 @@ export default {
       'todoList'
   ],
   components: { BaseMessage },
-  data() {
-      return {
-    
-        title: "Build the Kanban Board",
-        description: "That would be a huge step forward..."
-                
-      }
+  methods: {
+    deleteCard(title) {
+      console.log(title);
+      this.$emit('delete-card', title);
+    }
   }
     
 }

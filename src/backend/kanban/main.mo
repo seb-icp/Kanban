@@ -54,7 +54,7 @@ actor {
         dbCards.update(cardId, card)
     };
 
-    func deleteCard(id: Id) : DB.Res<()> {
+    public func deleteCard(id: Id) : async DB.Res<()> {
         dbCards.delete(id)
     };
 
@@ -67,7 +67,11 @@ actor {
 
     public func test () : async () {
         ignore (addColumn("Todo"));
+        ignore (addColumn("InProgress"));
+        ignore (addColumn("Done"));
         ignore (addCard("Seb", "Hello World", 0));
+        ignore (addCard("Seba", "Hello World", 1));
+        ignore (addCard("Sebas", "Hello World", 2));
         return ();
     }
     
