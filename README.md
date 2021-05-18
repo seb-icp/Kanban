@@ -1,3 +1,6 @@
-Welcome! This a is simple Kanban built on the Internet Computer.
+Welcome! This a is simple Kanban board built on the Internet Computer.
 
-Also my first Vue project.
+Used : Vessel package manager / CRUD Framework / VueJS 3.O 
+First VueJS project. 
+
+Expect some slowliness. 
