@@ -13,7 +13,7 @@ How to try the app ?
 
 3) dfx deploy 
 
-4) dfx canister call kanban init 
+4) dfx canister call kanban init (DO NOT FORGET THIS COMMAND)
 
 5) Go into your browser : http://127.0.0.1:8000/?canisterId=rrkah-fqaaa-aaaaa-aaaaq-cai (or other canisterId if your asset canister has a different id).
 
